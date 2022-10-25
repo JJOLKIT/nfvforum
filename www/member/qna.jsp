@@ -1,0 +1,126 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file = "/header.jsp"%>
+<%@ page import="board.notice.*" %>
+<%@ page import="board.media.*" %>
+<%@ page import="contents.partner.*" %>
+<%@ page import="contents.history.*" %>
+<%@ page import="property.SiteProperty" %>
+<%@ page import="util.*" %>
+<%@ page import="java.util.*" %>
+
+
+
+<script>
+	$(function(){
+		$('.u_email').on('change',function(){
+			$('.u_email2').val($(this).val());
+		});
+	});
+	
+	
+	function goSave() {
+		if ($("#name").val().trim() == "") {
+			alert("이름을 입력해 주세요.");
+			$("#name").focus();
+			return false;
+		}
+		if ($("#email1").val().trim() == "") {
+			alert("이메일을 입력해 주세요.");
+			$("#email1").focus();
+			return false;
+		}
+		if ($("#email2").val().trim() == "") {
+			alert("나머지 이메일을 입력해 주세요.");
+			$("#email2").focus();
+			return false;
+		}
+		if ($("#title").val().trim() == "") {
+			alert("제목을 입력해 주세요.");
+			$("#title").focus();
+			return false;
+		}
+		if ($("#contents").val().trim() == "") {
+			alert("이름을 입력해 주세요.");
+			$("#contents").focus();
+			return false;
+		}
+		let emailMerge = $("#email1").val()+'@'+$("#email2").val();
+		$("#email").val(emailMerge);
+
+		console.log($("#email").val());
+		$("#frm").submit();
+	}
+</script>
+
+
+
+
+<section id="sub" class="qna join">
+
+	<%@ include file = "/include/sub_top.jsp"%>
+
+	<!-- sub_contents -->
+	<section class="sub_contents">
+		<div class="container_wrap">
+			<div class="container">
+				<h3 class="sub_title"><span>1:1 문의</span></h3>
+				<article class="sub_cont">
+					<!-- <h4 class="sub_des_title">qna 입니다.</h4> -->
+					<div class="cont1">
+						<form method="post" id="frm" action="<%=Function.getSslCheckUrl(request.getRequestURL())%>/process.jsp" enctype="multipart/form-data">
+						<table>
+							<colgroup>
+								<col width="200px">
+								<col width="*">
+								<col width="200px">
+								<col width="*">
+							</colgroup>
+							<tbody>
+								<tr class="clear">
+									<th><span class="star">이름</span></th>
+									<td>
+										<input type="text" class="u_id" name="name" id="name" />
+									</td>
+									<th class="email_c"><span class="star">E-mail</span></th>
+									<td class="email_c clear">
+										<input type="text" class="u_email1" id="email1" >
+										<i>@</i>
+										<select class="u_email">
+											<option value="">직접입력</option>
+											<option value="naver.com"> naver.com</option>									
+											<option value="gmail.com"> gmail.com</option>
+											<option value="hanmail.net"> hanmail.net</option>									
+											<option value="nate.com"> nate.com</option>
+										</select>
+										<input type="text" class="u_email2 pic" id="email2">
+									</td>
+								</tr>
+								<tr>
+									<th><span class="star">제목</span></th>
+									<td colspan="3">
+										<input type="text" name="title" id="title"/></label>
+									</td>
+								</tr>
+								<tr class="pic">
+									<th><span class="star">메세지</span></th>
+									<td colspan="3" class="txt">
+										<textarea name="contents" id="contents"></textarea>
+									</td>
+								</tr>
+							</tbody>
+							<input type="hidden" name="cmd" value="write" />
+							<input type="hidden" name="email" id="email" value="" />
+						</table>
+						<p class="star">수집된 개인정보는 문의에 대한 회신의 목적으로만 활용합니다.</p>
+					</form>					
+					</div>
+					<div class="btnSet clear">
+						<a href="javascript:;" class="btn" onclick="goSave();">메일 보내기</a>
+					</div>
+				</article>
+			</div>
+		</div>
+	</section>
+</section>
+
+<%@ include file = "/footer.jsp"%>

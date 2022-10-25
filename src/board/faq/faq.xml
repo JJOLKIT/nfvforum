@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="faq">
+    
+    <!-- 공통조건 -->
+	<sql id="searchSql">		
+		<!-- WHERE 절 검색 -->
+		<dynamic prepend="where">
+			1=1
+			<isNotNull property="scategory">
+				<isNotEqual property="scategory" compareValue="">
+					and (partner_fk=#scategory#)
+				</isNotEqual>
+			</isNotNull>
+			<isNotNull property="sdisplay">
+				<isNotEqual property="sdisplay" compareValue="">
+					and (display=#sdisplay#)
+				</isNotEqual>
+			</isNotNull>
+			<!-- 검색어 검색 -->
+			<isNotNull property="sval">
+				<isNotEqual property="sval" compareValue="">
+					<!-- 검색 타입이 all일 때 -->
+					<isEqual property="stype" compareValue="all">
+						and ( (contents like '%$sval$%' ) or (title like '%$sval$%' ) ) 					
+					</isEqual>
+					<!-- 검색 타입이 all이 아닐때 해당 stype으로 검색 -->
+					<isNotEqual property="stype" compareValue="all">
+						and ($stype$ like '%$sval$%' )
+					</isNotEqual>
+				</isNotEqual>
+			</isNotNull>
+		</dynamic>
+	</sql>
+	
+	<!-- 해당 테이블의 총 게시글 수 -->
+	<select id="count" parameterClass="java.util.HashMap" resultClass="Integer">
+        select count(*) from mom_faq
+        <include refid="searchSql" />	
+    </select>
+    
+	<select id="list" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select *
+        from mom_faq
+        <include refid="searchSql" />
+		ORDER BY rank ASC, registdate DESC LIMIT $startPageNo$, $pageRows$
+    </select>
+    
+	<insert id="insert" parameterClass="java.util.HashMap">
+        INSERT INTO mom_faq (
+        	category, title, contents, registdate, display, rank
+        ) VALUES (
+        	#category#, #title#, #contents#, now(), #display#, #rank#
+        )
+        <selectKey keyProperty="no" resultClass="Integer">
+        	SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    
+	<update id="update" parameterClass="java.util.HashMap">
+        UPDATE mom_faq SET
+        	category=#category#, title=#title#, contents=#contents#, display=#display#, rank=#rank#
+        WHERE no = #no#
+    </update>
+    
+	<select id="read" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT *
+        FROM mom_faq
+        where no = #no#
+    </select>
+    
+    <delete id="delete" parameterClass="java.util.HashMap">
+        DELETE FROM mom_faq WHERE no=#no#
+    </delete>
+    
+</sqlMap>

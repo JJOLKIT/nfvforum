@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="comment">
+
+    <typeAlias alias="comment_vo" type="board.comment.CommentVO"/>
+
+	<select id="list" parameterClass="comment_vo" resultClass="comment_vo">
+        select *
+        from comment
+        where parent_fk = #parent_fk# and tablename = #tablename#
+		ORDER BY no ASC
+    </select>
+	
+	<!-- 해당 테이블에 게시글 작성 -->
+    <insert id="insert" parameterClass="comment_vo">
+        INSERT INTO comment (
+        	parent_fk, tablename, member_fk, password, name, contents
+        ) VALUES (
+        	#parent_fk#, #tablename#, #member_fk#, $db_encryption$(#password#), #name#, #contents#
+        )
+        <selectKey keyProperty="no" resultClass="Integer">
+        	SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    
+    <update id="update" parameterClass="comment_vo">
+        UPDATE comment SET
+        	parent_fk=#parent_fk#, tablename = #tablename#, member_fk=#member_fk#, name=#name#, contents=#contents#
+        WHERE no = #no#
+    </update>
+    
+    <delete id="delete" parameterClass="comment_vo">
+        DELETE FROM comment WHERE no=#no#
+    </delete>
+    
+    <select id="checkPassword" parameterClass="comment_vo" resultClass="Integer">
+        select count(password) as cnt
+        from comment
+		where no = #no# and password = $db_encryption$(#password#)
+    </select>
+    
+    <select id="checkAuth" parameterClass="comment_vo" resultClass="Integer">
+        select count(*) as cnt
+        from comment
+		where no = #no# and member_fk = #member_fk#
+    </select>
+    
+</sqlMap>

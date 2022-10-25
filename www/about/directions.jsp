@@ -1,0 +1,111 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ include file = "/header.jsp"%>
+<%@ page import="board.notice.*" %>
+<%@ page import="board.media.*" %>
+<%@ page import="contents.partner.*" %>
+<%@ page import="contents.history.*" %>
+<%@ page import="property.SiteProperty" %>
+<%@ page import="util.*" %>
+<%@ page import="java.util.*" %>
+
+
+
+
+<section id="sub">
+
+	<%@ include file = "/include/sub_top.jsp"%>
+
+	<!-- sub_contents -->
+    <section class="sub_contents">
+        <div class="container_wrap">
+            <div class="container maps">
+                <h3 class="sub_title"><span>찾아오시는 길</span></h3>
+                <address>서울시 금천구 가산디지털1로 131, C동 1502호(BYC하이시티, 가산동)</address>
+                <span><abbr title="telephone">Tel.</abbr>070-7860-4306</span>
+            </div>
+        </div>
+        <!-- Google map -->
+        <div class="map_container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3166.3119645606535!2d126.88008501526727!3d37.47696397981476!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357b61e38f95aca9%3A0x6bc8e4297a260c12!2z7ZWc6rWt64Sk7Yq47JuM7YGs7IKw7JeF7ZiR7ZqM!5e0!3m2!1sko!2skr!4v1601744762083!5m2!1sko!2skr" width="600" height="550" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+        </div>
+        <div class="container_wrap">
+            <article class="container traffic">
+                <h4 class="sub_des_title">전철을 타고 오시는 경우</h4>
+                <p><em class="subway_blue">1</em><strong>호선,</strong> <em class="subway_brown_green">7</em><strong>호선 가산디지털단지역 5번출구</strong> 도보 5분 거리.</p>
+            </article>
+            <article class="container traffic">
+                <h4 class="sub_des_title">승용차를 타고 오시는 경우</h4>
+                <ul>
+                    <li>
+                        <em>강남</em>
+                        <span>
+                            <strong>약 14.5km:50분정도 소요</strong>
+                            <span><i>강남역(테헤란로)</i></span>
+                            <span><i>서초로</i></span>
+                            <span><i>서울고교(효령로)</i></span>
+                            <span><i>서울지하철공단삼거리(남부순환도로)</i></span>
+                            <span><i>공단오거리</i></span>
+                            <span><i>디지털3단지</i></span>
+                            <span><i>수출의 다리(고가도로)</i></span>
+                            <span><i>BYC하이시티</i></span>
+                        </span>
+                    </li>
+                    <li>
+                        <em>목동</em>
+                        <span>
+                            <strong>약 7.2km : 12분정도 소요</strong>
+                            <span><i>목동역</i></span>
+                            <span><i>오목교</i></span>
+                            <span><i>서부간선도로</i></span>
+                            <span><i>칠성 2차 아파트 앞</i></span>
+                            <span><i>안양방면으로 우회전</i></span>
+                            <span><i>BYC 하이시티</i></span>
+                        </span>
+                    </li>
+                    <li>
+                        <em>영등포</em>
+                        <span>
+                            <strong>약 6km : 17분정도 소요</strong>
+                            <span><i>영등포역</i></span>
+                            <span><i>대림삼거리(신길로)</i></span>
+                            <span><i>시흥IC</i></span>
+                            <span><i>공단오거리</i></span>
+                            <span><i>디지털3단지</i></span>
+                            <span><i>수출의 다리(고가도로)</i></span>
+                            <span><i>BYC하이시티</i></span>
+                        </span>
+                    </li>
+                    <li>
+                        <em>광명</em>
+                        <span>
+                            <strong>약 3.2km : 14분정도 소요</strong>
+                            <span><i>광명사거리역</i></span>
+                            <span><i>철산역</i></span>
+                            <span><i>광성초교삼거리</i></span>
+                            <span><i>철산대교사거리</i></span>
+                            <span><i>철산대교</i></span>
+                            <span><i>디지털3단지</i></span>
+                            <span><i>BYC하이시티</i></span>
+                        </span>
+                    </li>
+                    <li>
+                        <em>안양</em>
+                        <span>
+                            <strong>약 15km : 40분정도 소요</strong>
+                            <span><i>안양시청</i></span>
+                            <span><i>범계사거리(시민로)</i></span>
+                            <span><i>시흥사거리(시흥대로)</i></span>
+                            <span><i>시흥대교</i></span>
+                            <span><i>금천IC(서해안고속도로)</i></span>
+                            <span><i>금천IC(서부간선도로)</i></span>
+                            <span><i>디지털3단지</i></span>
+                            <span><i>BYC하이시티</i></span>
+                        </span>
+                    </li>
+                </ul>
+            </article>
+        </div>
+    </section>
+</section>
+
+<%@ include file = "/footer.jsp"%>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="member">
+    
+    <!-- 공통조건 -->
+	<sql id="searchSql">		
+		<!-- WHERE 절 검색 -->
+		<dynamic prepend="where">
+		    1 = 1
+			<isNotNull property="sval">
+				<isNotEqual property="sval" compareValue="">
+					<isEqual property="stype" compareValue="all">
+						and ( (name like '%$sval$%' ) or (id like '%$sval$%' ) ) 					
+					</isEqual>
+					<isNotEqual property="stype" compareValue="all">
+						and ($stype$ like '%$sval$%' )
+					</isNotEqual>
+				</isNotEqual>
+			</isNotNull>
+		</dynamic>
+	</sql>
+	
+	<select id="count" parameterClass="java.util.HashMap" resultClass="Integer">
+        select count(*) from member
+        <include refid="searchSql" />	
+    </select>
+	
+    <select id="list" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select * from member
+        <include refid="searchSql" />
+		ORDER BY no DESC LIMIT $startPageNo$, $pageRows$	
+    </select>
+    
+    <insert id="insert" parameterClass="java.util.HashMap" >
+        insert into member
+        	(id,password,tel,email,grade,name,memo)
+        values
+        	(#id#,password(#password#),#tel#,#email#,0,#name#,#memo#)
+        <selectKey keyProperty="no" resultClass="Integer">
+			SELECT  LAST_INSERT_ID()
+		</selectKey>
+    </insert>
+    
+    <update id="update" parameterClass="java.util.HashMap">
+        update member set
+        	<isNotEqual property="password" compareValue="">
+        	    password = password(#password#),
+        	</isNotEqual>
+        	tel=#tel#,email=#email#,name=#name#,memo=#memo#
+        where no=#no#
+    </update>
+    
+    
+    <delete id="delete" parameterClass="Integer">
+        delete from member where no=#no#
+    </delete>
+    
+    <select id="read" parameterClass="Integer" resultClass="java.util.HashMap">
+    	<![CDATA[
+        select *
+         from member where no=#no#
+         ]]>
+    </select>
+    
+    <select id="loginCheck" parameterClass="java.util.HashMap" resultClass="Integer">
+        select COUNT(*) from member where id=#id# and password=password(#password#)
+    </select>
+    
+    <select id="loginSessionInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select * from member where id=#id# and password=password(#password#)
+    </select>
+    
+    <select id="idcheck" parameterClass="java.util.HashMap" resultClass="Integer">
+        select count(*) as cnt from member where id=#id#
+    </select>
+    
+    <!-- 관리자 로그인 접속 기록 -->
+    <sql id="historySearchSql">
+		<!-- WHERE 절 검색 -->
+		<dynamic prepend="where">
+		    1=1
+		    <isNotNull property="sval">
+				<isNotEqual property="sval" compareValue="">
+					<isEqual property="stype" compareValue="all">
+						and ( (name like '%$sval$%' ) or (id like '%$sval$%' )) 					
+					</isEqual>
+					<isNotEqual property="stype" compareValue="all">
+						and ($stype$ like '%$sval$%' )
+					</isNotEqual>
+				</isNotEqual>
+			</isNotNull>
+		</dynamic>
+	</sql>
+	
+    <select id="countLoginHistory" parameterClass="java.util.HashMap" resultClass="Integer">
+        select count(*) from member_loginhistory
+        <include refid="historySearchSql"/>	
+    </select>
+    
+    <select id="listLoginHistory" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select * from member_loginhistory
+        <include refid="historySearchSql"/>
+		ORDER BY no DESC LIMIT $startPageNo$, $pageRows$	
+    </select>
+    
+    <insert id="insertLoginHistory" parameterClass="java.util.HashMap" >
+        insert into member_loginhistory
+        	(id, name, logindate, ip)
+        values
+        	(#id#, #name#, now(), #ip#)
+    </insert>
+    
+	
+</sqlMap>

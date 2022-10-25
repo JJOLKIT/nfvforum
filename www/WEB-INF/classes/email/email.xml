@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="email">
+    
+    <typeAlias alias="mail_vo" type="email.MailVO"/>
+    <typeAlias alias="mailList_vo" type="email.MailListVO"/>
+    
+    <!-- 공통조건 -->
+	<sql id="searchSql">		
+		<!-- WHERE 절 검색 -->
+		<dynamic prepend="where">
+			<!-- 날짜 검색 -->
+			<isNotEqual property="startday" compareValue="">
+			    <isNotEqual property="endday" compareValue="" prepend="and">
+			        registdate between '$startday$ 00:00:00' and '$endday$ 23:59:59'
+			    </isNotEqual>
+			</isNotEqual>
+			
+			<!-- 검색어 검색 -->
+			<isNotEqual property="sval" compareValue="">
+				<isEqual property="stype" compareValue="all" prepend="and">
+					(title like '%$sval$%' or contents like '%$sval$%')
+				</isEqual>
+				<isEqual property="stype" compareValue="sendman" prepend="and">
+					$stype$ like '%$sval$%'
+				</isEqual>
+				<isEqual property="stype" compareValue="receiveman" prepend="and">
+					no in (select emailhistory_fk from $listtablename$ where receiveemail like '%$sval$%')
+				</isEqual>
+			</isNotEqual>
+		</dynamic>
+	</sql>
+	
+	<!-- 해당 테이블의 총 게시글 수 -->
+	<select id="count" parameterClass="mail_vo" resultClass="Integer">
+        select count(*) from $tablename$
+        <include refid="searchSql" />	
+    </select>
+    
+	<select id="list" parameterClass="mail_vo" resultClass="mail_vo">
+        select
+        *
+        from $tablename$
+        <include refid="searchSql" />
+		ORDER BY no DESC LIMIT $startPageNo$, $pageRows$
+    </select>
+    
+    <delete id="delete" parameterClass="mail_vo">
+        DELETE FROM $tablename$ WHERE no=#no#
+    </delete>
+	
+	<!-- 해당 테이블에 게시글 작성 -->
+    <insert id="insert" parameterClass="mail_vo">
+        INSERT INTO $tablename$ (
+        	sendman, title, contents,
+        	filename, filesize,
+        	filename2, filesize2,
+        	filename3, filesize3,
+        	filename_org, filename2_org,
+        	filename3_org, 
+        	registdate, totalcount
+        ) VALUES (
+        	#sendman#, #title#, #contents#,
+        	#filename#, #filesize#,
+        	#filename2#, #filesize2#,
+        	#filename3#, #filesize3#,
+        	#filename_org#, #filename2_org#,
+        	#filename3_org#,
+        	now(), #totalcount#
+        )
+        <selectKey keyProperty="no" resultClass="Integer">
+        	SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    
+    <update id="updateTotalcount" parameterClass="mail_vo">
+        UPDATE $tablename$ SET
+        	totalcount = #totalcount#
+        WHERE no = #no#
+    </update>
+    
+    <select id="read" parameterClass="mail_vo" resultClass="mail_vo">
+    	<![CDATA[
+        SELECT 
+        	*
+        FROM $tablename$
+        where no = #no#
+        ]]>
+    </select>
+    
+    <!-- 총 발송수 -->
+	<select id="getTotalcount" parameterClass="mail_vo" resultClass="Integer">
+        select sum(totalcount) as totalcount from $tablename$
+        <include refid="searchSql" />	
+    </select>
+    
+	<!-- #################### 발송내역 ################# -->
+	
+	<!-- 저장 -->
+    <insert id="insertMailList" parameterClass="java.util.Map">
+        INSERT INTO $listtablename$ (
+        	emailhistory_fk, receiveemail
+        ) VALUES 
+        	$values$
+    </insert>
+    
+    <!-- 목록 -->
+    <select id="listMailList" parameterClass="java.util.Map" resultClass="mailList_vo">
+        select
+        	no, emailhistory_fk, receiveemail, registdate
+        from $listtablename$
+        where emailhistory_fk = #emailhistory_fk# 
+		ORDER BY receiveemail ASC
+    </select>
+    
+</sqlMap>

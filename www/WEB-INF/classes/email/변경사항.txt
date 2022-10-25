@@ -1,0 +1,10 @@
+Function encodeUTF8 메서드추가
+- utf8로 인코딩
+
+MailDATA -> MailVO
+MailMgr -> MailDAO
+
+MailListData -> MailListVO
+MailListMgr -> MailDAO에 통합
+
+비용메일은 별도 패키지로 구분

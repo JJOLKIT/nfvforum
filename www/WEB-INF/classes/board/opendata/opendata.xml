@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="opendata">
+    
+    <!-- 공통조건 -->
+	<sql id="searchSql">		
+		<!-- WHERE 절 검색 -->
+		<dynamic prepend="where">
+			1=1
+			<!-- 검색어 검색 -->
+			<isNotNull property="sval">
+				<isNotEqual property="sval" compareValue="">
+					<!-- 검색 타입이 all일 때 -->
+					<isEqual property="stype" compareValue="all">
+						and ( (contents like '%$sval$%' ) or (title like '%$sval$%' ) ) 					
+					</isEqual>
+					<!-- 검색 타입이 all이 아닐때 해당 stype으로 검색 -->
+					<isNotEqual property="stype" compareValue="all">
+						and ($stype$ like '%$sval$%' )
+					</isNotEqual>
+				</isNotEqual>
+			</isNotNull>
+			<isNotNull property = "sstartdate">
+				<isNotEqual property = "sstartdate" compareValue="">
+					<![CDATA[
+					AND ( registdate >= '$sstartdate$ 00:00:00')
+					]]>
+				</isNotEqual>
+			</isNotNull>
+			<isNotNull property = "senddate">
+				<isNotEqual property = "senddate" compareValue="">
+					<![CDATA[
+					AND ( registdate <= '$senddate$ 23:59:59' )
+					]]>
+				</isNotEqual>
+			</isNotNull>
+			
+		</dynamic>
+	</sql>
+	
+	<!-- 해당 테이블의 총 게시글 수 -->
+	<select id="count" parameterClass="java.util.HashMap" resultClass="Integer">
+        select count(*) from opendata
+        <include refid="searchSql" />	
+    </select>
+    
+	<select id="list" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select *
+        from opendata
+        <include refid="searchSql" />
+		ORDER BY top DESC, registdate DESC LIMIT $startPageNo$, $pageRows$
+    </select>
+	
+	<!-- 해당 테이블에 게시글 작성 -->
+    <insert id="insert" parameterClass="java.util.HashMap">
+        INSERT INTO opendata (
+        	name, title, contents, registdate, readno,
+        	filename_org, filename, filename2_org, filename2, filename3_org, filename3, filename4_org, filename4, filename5, filename5_org, filename6, filename6_org, filename7, filename7_org,  display, top, newicon
+        ) VALUES (
+        	#name#, #title#, #contents#, 
+        	<isNotEqual property="registdate" compareValue="">
+	       	    #registdate#,
+	       	</isNotEqual>
+	       	<isEqual property="registdate" compareValue="">
+	       	    NOW(),
+	       	</isEqual>
+        	0,
+        	#filename_org#, #filename#, #filename2_org#, #filename2#, #filename3_org#, #filename3#, #filename4_org#, #filename4#, #filename5#, #filename5_org#, #filename6#, #filename6_org#, #filename7#, #filename7_org#, #display#, #top#, #newicon#
+        )
+        <selectKey keyProperty="no" resultClass="Integer">
+        	SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    
+    <update id="update" parameterClass="java.util.HashMap">
+        UPDATE opendata SET
+        	name=#name#, title=#title#, 
+        <isNotEqual property="registdate" compareValue="">
+       	    registdate = #registdate#,
+       	</isNotEqual>
+        <isEqual property="filename_chk" compareValue="1">
+        	filename='', filename_org='',
+        </isEqual>
+        <isNotEqual property="filename" compareValue="">
+            <isNotNull property="filename">
+        		filename=#filename#, filename_org=#filename_org#,
+        	</isNotNull>
+        </isNotEqual>
+        <isEqual property="filename2_chk" compareValue="1">
+        	filename2='', filename2_org='',
+        </isEqual>
+        <isNotEqual property="filename2" compareValue="">
+            <isNotNull property="filename2">
+        		filename2=#filename2#, filename2_org=#filename2_org#,
+        	</isNotNull>
+        </isNotEqual>
+        <isEqual property="filename3_chk" compareValue="1">
+        	filename3='', filename3_org='',
+        </isEqual>
+        <isNotEqual property="filename3" compareValue="">
+            <isNotNull property="filename3">
+        		filename3=#filename3#, filename3_org=#filename3_org#,
+        	</isNotNull>
+        </isNotEqual>
+        <isEqual property="filename4_chk" compareValue="1">
+        	filename4='', filename4_org='',
+        </isEqual>
+        <isNotEqual property="filename4" compareValue="">
+            <isNotNull property="filename4">
+        		filename4=#filename4#, filename4_org=#filename4_org#,
+        	</isNotNull>
+        </isNotEqual>
+        <isEqual property="filename5_chk" compareValue="1">
+        	filename5='', filename5_org='',
+        </isEqual>
+        <isNotEqual property="filename5" compareValue="">
+            <isNotNull property="filename5">
+        		filename5=#filename5#, filename5_org=#filename5_org#,
+        	</isNotNull>
+        </isNotEqual>
+        <isEqual property="filename6_chk" compareValue="1">
+        	filename6='', filename6_org='',
+        </isEqual>
+        <isNotEqual property="filename6" compareValue="">
+            <isNotNull property="filename6">
+        		filename6=#filename6#, filename6_org=#filename6_org#,
+        	</isNotNull>
+        </isNotEqual>
+        <isEqual property="filename7_chk" compareValue="1">
+        	filename7='', filename7_org='',
+        </isEqual>
+        <isNotEqual property="filename7" compareValue="">
+            <isNotNull property="filename7">
+        		filename7=#filename7#, filename7_org=#filename7_org#,
+        	</isNotNull>
+        </isNotEqual>
+        
+        
+        	contents=#contents#, display=#display#, top=#top#, newicon=#newicon#
+        WHERE no = #no#
+    </update>
+    
+    <select id="read" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT 
+        	*
+        FROM opendata
+        where no = #no#
+    </select>
+    
+    <select id="prev" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT 
+        	*
+        FROM opendata WHERE no = (SELECT MAX(no) FROM opendata
+       	<![CDATA[ 
+       	WHERE NO < #no#
+       	]]>
+       	<isNotNull property="sval">
+			<isNotEqual property="sval" compareValue="">
+				검색 타입이 all일 때
+				<isEqual property="stype" compareValue="all">
+					and ( (contents like '%$sval$%' ) or (title like '%$sval$%' ) ) 					
+				</isEqual>
+				검색 타입이 all이 아닐때 해당 stype으로 검색
+				<isNotEqual property="stype" compareValue="all">
+					and ($stype$ like '%$sval$%' )
+				</isNotEqual>
+			</isNotEqual>
+		</isNotNull>
+		<isNotNull property="slang">
+			<isNotEqual property="slang" compareValue="">
+				AND LANG = '$slang$'
+			</isNotEqual>
+		</isNotNull>
+       	)
+        
+		ORDER BY registdate DESC
+    </select>
+    
+    <select id="next" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT 
+        	*
+        FROM opendata WHERE no = (SELECT MIN(no) FROM opendata 
+        <![CDATA[
+        WHERE no > #no#
+        ]]>
+        <isNotNull property="sval">
+			<isNotEqual property="sval" compareValue="">
+				<!-- 검색 타입이 all일 때 -->
+				<isEqual property="stype" compareValue="all">
+					and ( (contents like '%$sval$%' ) or (title like '%$sval$%' ) ) 					
+				</isEqual>
+				<!-- 검색 타입이 all이 아닐때 해당 stype으로 검색 -->
+				<isNotEqual property="stype" compareValue="all">
+					and ($stype$ like '%$sval$%' )
+				</isNotEqual>
+			</isNotEqual>
+		</isNotNull>
+		<isNotNull property="slang">
+			<isNotEqual property="slang" compareValue="">
+				AND LANG = '$slang$'
+			</isNotEqual>
+		</isNotNull>
+        )
+        
+		ORDER BY registdate DESC
+    </select>
+    
+    <select id="filenames" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+    	<![CDATA[
+        SELECT 
+        	filename, filename2, filename3, filename4, filename5, filename6, filename7
+        FROM opendata
+        where no = #no#
+        ]]>
+    </select> 
+        
+    <delete id="delete" parameterClass="java.util.HashMap">
+        DELETE FROM opendata WHERE no=#no#
+    </delete>
+    
+    <update id="updateReadno" parameterClass="java.util.HashMap">
+        UPDATE opendata SET readno = readno+1 WHERE no = #no#
+    </update>
+    
+    <select id="mainList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select *
+        from opendata
+        <include refid="searchSql" />
+		ORDER BY registdate DESC LIMIT 0, $number$
+    </select>
+    
+</sqlMap>

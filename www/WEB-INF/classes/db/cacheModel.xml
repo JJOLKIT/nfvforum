@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="cacheModel">
+	<cacheModel id="orgCache" type="LRU" readOnly="true" serialize="false" >
+        <flushInterval hours="24"/><!-- 24시간마다 cache를 초기화 -->
+        <flushOnExecute statement="dataAccount.accountInsert"/><!-- 해당 statement가 수행될 때 cache 초기화 -->
+        <flushOnExecute statement="dataAccount.accountOrgDelete"/><!-- 해당 statement가 수행될 때 cache 초기화 -->
+        <property name="size" value="1000" /><!-- cache size가 초과될 때마다 하나씩 제거 -->
+     </cacheModel>
+         
+</sqlMap>

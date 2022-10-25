@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="after">
+    
+    <!-- 공통조건 -->
+	<sql id="searchSql">		
+		<!-- WHERE 절 검색 -->
+		<dynamic prepend="where">
+			1=1
+			<isNotNull property="scategory">
+				<isNotEqual property="scategory" compareValue="">
+					and (category=#scategory#)
+				</isNotEqual>
+			</isNotNull>
+			<isNotNull property="sdisplay">
+				<isNotEqual property="sdisplay" compareValue="">
+					and (display=#sdisplay#)
+				</isNotEqual>
+			</isNotNull>
+			<!-- 검색어 검색 -->
+			<isNotNull property="sval">
+				<isNotEqual property="sval" compareValue="">
+					<!-- 검색 타입이 all일 때 -->
+					<isEqual property="stype" compareValue="all">
+						and ( (contents like '%$sval$%' ) or (title like '%$sval$%' ) ) 					
+					</isEqual>
+					<!-- 검색 타입이 all이 아닐때 해당 stype으로 검색 -->
+					<isNotEqual property="stype" compareValue="all">
+						and ($stype$ like '%$sval$%' )
+					</isNotEqual>
+				</isNotEqual>
+			</isNotNull>
+		</dynamic>
+	</sql>
+	
+	<!-- 해당 테이블의 총 게시글 수 -->
+	<select id="count" parameterClass="java.util.HashMap" resultClass="Integer">
+        select count(*) from mom_after
+        <include refid="searchSql" />	
+    </select>
+    
+	<select id="list" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select *
+        from mom_after
+        <include refid="searchSql" />
+		ORDER BY registdate DESC LIMIT $startPageNo$, $pageRows$
+    </select>
+	
+	<!-- 해당 테이블에 게시글 작성 -->
+    <insert id="insert" parameterClass="java.util.HashMap">
+        INSERT INTO mom_after (
+        	 name, password, title, contents, registdate, display, category
+        ) VALUES (
+        	#name#, password('$password$'), #title#, #contents#, NOW(), #display#, #category#
+        )
+        <selectKey keyProperty="no" resultClass="Integer">
+        	SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    
+    <update id="update" parameterClass="java.util.HashMap">
+        UPDATE mom_after SET
+        	name=#name#, title=#title#,
+        	contents=#contents#, display=#display#, category=#category#
+        WHERE no = #no#
+    </update>
+    
+    <select id="read" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT 
+        	*
+        FROM mom_after
+        where no = #no#
+    </select>
+    
+    <select id="filenames" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+    	<![CDATA[
+        SELECT 
+        	filename, filename2, filename3
+        FROM mom_after
+        where no = #no#
+        ]]>
+    </select> 
+        
+    <delete id="delete" parameterClass="java.util.HashMap">
+        DELETE FROM mom_after WHERE no=#no#
+    </delete>
+    
+    <update id="updateReadno" parameterClass="java.util.HashMap">
+        UPDATE mom_after SET readno = readno+1 WHERE no = #no#
+    </update>
+    
+    <select id="mainList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        select *
+        from mom_after
+        <include refid="searchSql" />
+		ORDER BY registdate DESC LIMIT 0, $number$
+    </select>
+    
+    <select id="passwordCheck" parameterClass="java.util.HashMap" resultClass="Integer">
+        SELECT 
+        	count(*) as cnt
+        FROM mom_after
+        where no = #no# and password = password('$password$')
+    </select>
+    
+</sqlMap>

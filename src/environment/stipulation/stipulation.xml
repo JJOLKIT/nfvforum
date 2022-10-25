@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="stipulation">
+    
+    <select id="select" resultClass="environment.stipulation.StipulationVO" parameterClass="Integer">
+        select no, privacy_text, privacy_mini_text, join_text, editname, editdate from stipulation where no = 1
+    </select>
+    
+    <update id="update" parameterClass="environment.stipulation.StipulationVO">
+        update stipulation set
+        	privacy_text=#privacy_text#, privacy_mini_text=#privacy_mini_text#, join_text=#join_text#, editname=#editname#, editdate=now()
+        where no = 1
+    </update>
+    
+</sqlMap>
